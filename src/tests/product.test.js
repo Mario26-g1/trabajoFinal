@@ -1,6 +1,7 @@
 const request = require("supertest")
 const app = require("../app")
 const Category = require("../models/Category")
+const ProductImg = require("../models/ProductImg")
 require("../models")
 
 const URL_BASE = '/api/v1/products'
@@ -50,6 +51,7 @@ test("POST -> 'URL_BASE', should resturn status code 201 and res.body.title = pr
     expect(res.body.title).toBe(product.title)
 
 })
+
 
 test("GET -> 'URL_BASE', should resturn status code 200 and res.body.legnth = 1", async () => {
 
@@ -108,6 +110,26 @@ test("PUT -> 'URL_BASE/:id', should resturn status code 200 and res.body.title =
     expect(res.body).toBeDefined()
     expect(res.body.title).toBe(productUpdate.title)
 
+});
+
+
+test("POST -> 'URL_BASE/:id/images', should return status code 200 and res.body.length ===1", async () => {
+
+    const imageBody = {
+        url: "http://localhost:8080/uploads/acade.jpg",
+        filename: "otro"
+    }
+
+    image = await ProductImg.create(imageBody)
+
+    const res = await request(app)
+        .post(`${URL_BASE}/${productId}/images`)
+        .send([image.id])
+        .set("Authorization", `Bearer ${TOKEN}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body).toBeDefined()
+    expect(res.body).toHaveLength(1)
 })
 
 test("DELET -> 'URL_BASE/:id', should resturn status code 204", async () => {
